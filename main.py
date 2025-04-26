@@ -6,3 +6,9 @@ from fastapi import Request #fastapi request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+origins=["*"]
+
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    await create_tables()
+    yield 
