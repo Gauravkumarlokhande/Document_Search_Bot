@@ -12,3 +12,4 @@ origins=["*"]
 async def lifespan(app:FastAPI):
     await create_tables()
     yield 
+

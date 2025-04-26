@@ -42,4 +42,5 @@ session=Session()
 new_person=Person(name='same',age=80,id=1)
 session.add(new_person)
 session.commit()
+# session.close()  - commits and close connection
 
