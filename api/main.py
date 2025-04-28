@@ -39,6 +39,7 @@ async def custom_validation_exception_handler(
         error_details=exc.errors()[0] # searching for error message
         error_message = f"{error_details.get('msg')}: {error_details.get('loc')[-1]}"
     except Exception:
+        
         error_message='Field Validation Error'
     
     return JSONResponse(
