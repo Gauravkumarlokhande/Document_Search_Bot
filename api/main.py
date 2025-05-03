@@ -6,16 +6,17 @@ from fastapi import Request #fastapi request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from api.router.health import router as health_router
+from structures.table_structure import create_table
 
 origins=["*"]
 
-async def say_something():
-    return "hello"
+# async def say_something():
+#     return "hello"
 
-@asynccontextmanager  # this is for the lifespan of the application. anaything before yield is at the startup and after yeild is at the shut down of app
+@asynccontextmanager  # this is for the lifespan of the application. anaything before yield is at the startup and after yeild is at the shut down of app. used for resources that require startup and shutdown at the lifespan of the application
 async def lifespan(app:FastAPI):
-    # await create_tables()
-    await say_something()
+    await create_table()
+    # await say_something()
     yield 
 
 app = FastAPI(lifespan=lifespan)
