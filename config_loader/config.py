@@ -14,7 +14,7 @@ from openai import AsyncAzureOpenAI
 
 
 try:
-    load_dotenv("config/.env")
+    load_dotenv("config_loader/.env")
 except Exception as e:
     print("env loading error: ",e)
 
