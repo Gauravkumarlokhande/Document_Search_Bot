@@ -5,3 +5,9 @@ Start the chatbot with following command:
 ``` 
 poetry run uvicorn api.main:app --reload --host 0.0.0.0 --port 8080 
 ```
+
+Starting the minio server
+
+```
+minio.exe server C:\minio --console-address :9001
+```
