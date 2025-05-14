@@ -5,7 +5,7 @@ from uuid import uuid4  # used to generate unique random user id or request id
 from fastapi import Request #fastapi request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from api.router.health import router as health_router
+from router.health import router as health_router
 from structures.table_structure import create_table
 
 origins=["*"]
@@ -15,7 +15,9 @@ origins=["*"]
 
 @asynccontextmanager  # this is for the lifespan of the application. anaything before yield is at the startup and after yeild is at the shut down of app. used for resources that require startup and shutdown at the lifespan of the application
 async def lifespan(app:FastAPI):
+    
     await create_table()
+
     # await say_something()
     yield 
 

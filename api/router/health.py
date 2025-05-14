@@ -2,6 +2,7 @@
 from fastapi import FastAPI, APIRouter, Form
 from validation_models.schemas import health
 
+
 router=APIRouter()
 
 @router.post("/health")
