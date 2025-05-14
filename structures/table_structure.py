@@ -6,17 +6,17 @@ from sqlalchemy import (
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
-import os
-from dotenv import load_dotenv
-load_dotenv()
+from config_loader.config import Config
 
-db_url=os.getenv('DB_URL')
 
-db_engine=create_async_engine(db_url,pool_size=10, max_overflow=10, pool_timeout=30)
+cfg=Config()
+
+db_engine=create_async_engine(cfg.db_url,pool_size=10, max_overflow=10, pool_timeout=30)
 
 #session factory for session creation with async
 AsyncSessionLocal = sessionmaker(bind=db_engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base() # base class for orm models and you can inherit this class
+
 
 @asynccontextmanager
 async def async_session_scope():
