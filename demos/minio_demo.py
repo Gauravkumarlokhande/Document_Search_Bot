@@ -17,3 +17,14 @@ client = Minio(
 buckets = client.list_buckets()
 for bucket in buckets:
     print(bucket.name, bucket.creation_date)
+
+# List objects information.
+objects = client.list_objects("dsva")
+for obj in objects:
+    print(obj)
+
+for root,sub_folder, files in os.walk(r"/root/DSVA/processed_data"):
+    for filename in files:
+        folder_prefix = "data/"
+        client.fput_object("dsva",os.path.join(folder_prefix,filename),os.path.join(root,filename))
+
