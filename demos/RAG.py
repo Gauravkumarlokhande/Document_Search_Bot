@@ -41,11 +41,11 @@ chat_suggest = ChatGroq(
 def generate_suggestion_questions(user_question: str) -> List[str]:
     prompt = f"""
     
-    Based on the following user question, generate 3 concise and relevant follow-up chemistry questions.
-    The followup questions should be totally related to the user question.
-    if the user question is not related to any chemistry related or scientific concept then just say: No Sugegstions for this question.
+    Based on the following answer, generate 3 concise and relevant follow-up chemistry questions.
+    The followup questions should be totally related to the answer.
+    
 
-    User question: "{user_question}"
+    Answer: "{user_question}"
 
     Follow-up questions:
     1.
@@ -118,6 +118,7 @@ Key Guidelines:
 Ensure your responses are always clear, concise, and directly relevant to the user’s queries.
 Maintain a professional tone in all responses.
 If you cannot find an answer in the available information or if the information is not related to the query, then only respond with "No Information Available" instead of speculating.
+if you are responding with "No Information Available", then do not give any other information with it.
 If the context provides relevant information, use it to answer questions in a clear manner.
 Do not reference the context or source documents directly in your response.
 For follow-up questions, refer to the previous discussion to provide a more comprehensive response.
@@ -194,17 +195,14 @@ if option == "Get answer from existing database":
         with st.chat_message("user"):
             st.markdown(user_input)
 
-        with st.sidebar:
-            st.subheader("suggestion questions")
-            suggestions = generate_suggestion_questions(user_input)
-            for i in range(len(suggestions)):
-                st.markdown(f"{i+1}. {suggestions[i]}")
+       
 
 
 
         with st.chat_message("assistant"):
             def get_response():
                 response_dict={}
+                answer=None
                 def answer_from_bot():
                     loop = asyncio.new_event_loop()
                     asyncio.set_event_loop(loop)
@@ -212,15 +210,23 @@ if option == "Get answer from existing database":
                         asyncio.to_thread(retrieval_chain.invoke, {'input': user_input})
                     )
                     response_dict['value']=response
+                    answer=response['answer']
                     for chunk in response['answer']:
                         yield chunk
-                return answer_from_bot,response_dict 
+                return answer_from_bot,response_dict
             answer_from_bot,response_dict = get_response()
+            print(response_dict)
             res = st.write_stream(answer_from_bot())
-            
+        
+       
         # context_docs = response.get("context", []) 
         st.session_state.chat_history.append({"role": "assistant", "content": res, 'docs':response_dict['value']})
 
+        with st.sidebar:
+            st.subheader("suggestion questions")
+            suggestions = generate_suggestion_questions(st.session_state.chat_history[-1]['content'])
+            for i in range(len(suggestions)):
+                st.markdown(f"{i+1}. {suggestions[i]}")
     
     if st.session_state.get("chat_history"):
 
@@ -233,9 +239,13 @@ if option == "Get answer from existing database":
                 src = doc.metadata.get("source", "Unknown")
                 pg  = doc.metadata.get("page", "N/A")
                 st.markdown(f"{src} , Page Number: {pg}")
+            if st.session_state.get("chat_history"):
+                with st.expander("View PDF Chunk"):
+                    st.markdown(st.session_state.chat_history[-1]['docs'])
         else :
             st.markdown("*_No source documents used for this answer._*")
-
+        
+        
 else:
     if "vector_store" not in st.session_state:
         st.session_state.vector_store = None
@@ -339,3 +349,14 @@ else:
         with st.chat_message("assistant"):
             st.write(content)
         st.session_state.chat_history_pdf.append({"role": "assistant", "content": content})
+
+        if st.session_state.get("chat_history_pdf"):
+            with st.expander("View PDF Chunk"):
+                st.markdown(docs)
+
+
+        with st.sidebar:
+            st.subheader("suggestion questions")
+            suggestions = generate_suggestion_questions(st.session_state.chat_history_pdf[-1]['content'])
+            for i in range(len(suggestions)):
+                st.markdown(f"{i+1}. {suggestions[i]}")
