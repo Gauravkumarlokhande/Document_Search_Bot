@@ -195,9 +195,6 @@ if option == "Get answer from existing database":
         with st.chat_message("user"):
             st.markdown(user_input)
 
-       
-
-
 
         with st.chat_message("assistant"):
             def get_response():
@@ -225,8 +222,13 @@ if option == "Get answer from existing database":
         with st.sidebar:
             st.subheader("suggestion questions")
             suggestions = generate_suggestion_questions(st.session_state.chat_history[-1]['content'])
+           
+            count=1
             for i in range(len(suggestions)):
-                st.markdown(f"{i+1}. {suggestions[i]}")
+                if not "no information" in retrieval_chain.invoke({'input': suggestions[i]})['answer'].lower():
+                    
+                    st.markdown(f"{count}. {suggestions[i]}")
+                    count+=1
     
     if st.session_state.get("chat_history"):
 
